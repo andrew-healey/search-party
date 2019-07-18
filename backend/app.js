@@ -3,4 +3,6 @@ const app=express();
 
 const graphql=require("./graphql");
 
-app.use("/api",graphql);
+app.use("/",graphql);
+
+module.exports=app;
