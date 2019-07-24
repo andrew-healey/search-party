@@ -25,7 +25,7 @@ function EnterInfo({ setContact, back, next }) {
 				{inputOrder.map((n, i) => (
 					<input
 						key={i}
-						type="text"
+						type={inputTypes[n]}
 						placeholder={n}
 						value={contactInfo[n]}
 						onChange={evt =>
@@ -137,19 +137,18 @@ function ShareSearch({ search, broadcast, back, next }) {
 						</Fragment>
 					) : (
 						<Fragment>
-							<i className="fa fa-broadcast-tower" />{" "}
-							Broadcast
+							<i className="fa fa-broadcast-tower" /> Broadcast
 						</Fragment>
 					)
 				) : (
-					<Fragment><i className="fa fa-sync spinning"></i> Broadcasting</Fragment>
+					<Fragment>
+						<i className="fa fa-sync spinning" /> Broadcasting
+					</Fragment>
 				)}
 			</button>
 			<br />
 			<br />
-			<button
-				disabled={searchPromise instanceof Promise}
-				onClick={next}>
+			<button disabled={searchPromise instanceof Promise} onClick={next}>
 				Start
 			</button>
 		</div>
@@ -170,13 +169,9 @@ class Create extends Component {
 				authCode: null,
 				searchPromise: null
 			},
-			exitLeft: false,	
+			exitLeft: false
 		};
-		this.tabNames = [
-			"Enter Names",
-			"Add Information",
-			"Share Search"
-		];
+		this.tabNames = ["Enter Names", "Add Information", "Share Search"];
 	}
 
 	setNames = missing_names => {
@@ -197,7 +192,7 @@ class Create extends Component {
 				searchPromise: fetch("/api/searches", {
 					method: "POST",
 					body: this.getData()
-				}).then((data) => {
+				}).then(data => {
 					let { code, link, authCode } = data;
 					this.setState(({ search }) => ({
 						search: {
@@ -212,7 +207,7 @@ class Create extends Component {
 					this.props.setPage("search");
 				})
 			},
-			exitLeft: true,
+			exitLeft: true
 		}));
 	}
 
@@ -279,9 +274,9 @@ class Create extends Component {
 		};
 		return (
 			<div
-				className={`modal modal-page  ${
-					exitLeft ? " exitLeft" : ""
-				} ${active ? "visible" : ""}`}>
+				className={`modal modal-page  ${exitLeft ? " exitLeft" : ""} ${
+					active ? "visible" : ""
+				}`}>
 				<div className="modal-top-bar">
 					<i
 						className="close modal-icon fa"

@@ -8,4 +8,6 @@
 - Add organizer to proximal list
 
 - Video and audio communication with rtc
-- Comprehensive guides
+
+- Search Guides
+

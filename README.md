@@ -6,6 +6,11 @@ In the project directory, you can run:
 
 ### `npm start`
 
+Runs the backend.<br>
+This is necessary because Heroku uses npm start by default.
+
+### `npm app`
+
 Runs the app in the development mode.<br>
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
