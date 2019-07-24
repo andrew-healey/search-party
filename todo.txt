@@ -1,0 +1,11 @@
+- Allow form reset for createSearch modal
+- Confirm correct info for createSearch modal before sharing
+- Allow read guide/remind alert on start
+- Confirm delete search on exit
+- QR re-upload image
+- Back, join buttons
+- Action fab
+- Add organizer to proximal list
+
+- Video and audio communication with rtc
+- Comprehensive guides
