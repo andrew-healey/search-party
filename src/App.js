@@ -10,6 +10,7 @@ import "./App.scss";
 import CodeModal from "./pages/CodeModal";
 import Create from "./pages/Create.js";
 import QRModal from "./pages/InputQR.js";
+import PersonModal from "./pages/PersonModal.js";
 import Landing from "./pages/Landing.js";
 import SearchPage from "./pages/SearchPage.js";
 import { Sidebar } from "./pages/Sidebar";
@@ -21,14 +22,13 @@ class App extends Component {
 	}
 	render() {
 		let {
-			sidebar,
 			setSidebar,
+			sidebar,
 			page,
 			create,
-			setCreateModal,
-			setQRModal,
 			scan_qr,
-			share_code
+			share_code,
+			person_info
 		} = this.props;
 		let currentPage = {
 			landing: <Landing />,
@@ -37,9 +37,10 @@ class App extends Component {
 		return (
 			<Fragment>
 				<Sidebar active={sidebar} setSidebar={setSidebar} />
-				<Create active={create} setCreateModal={setCreateModal} />
-				<QRModal active={scan_qr} setQRModal={setQRModal} />
-				<CodeModal active={share_code} setQRModal={setCodeModal} />
+				<Create active={create} />
+				<QRModal active={scan_qr} />
+				<CodeModal active={share_code} />
+				<PersonModal active={person_info} />
 				{currentPage}
 			</Fragment>
 		);
@@ -52,7 +53,7 @@ export default connect(
 			sidebar,
 			name,
 			page,
-			modal: { create, scan_qr, share_code }
+			modal: { create, scan_qr, share_code, person_info }
 		}
 	}) => ({
 		sidebar,
@@ -60,7 +61,8 @@ export default connect(
 		page,
 		create,
 		scan_qr,
-		share_code
+		share_code,
+		person_info
 	}),
-	{ setSidebar, setCreateModal, setQRModal, setCodeModal }
+	{ setSidebar }
 )(App);

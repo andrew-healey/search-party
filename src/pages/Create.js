@@ -128,6 +128,7 @@ function ShareSearch({ search, broadcast, back, next }) {
 			)}
 			<br />
 			<button
+				className="button"
 				disabled={searchPromise instanceof Promise}
 				onClick={() => (!broadcasted ? broadcast() : null)}>
 				{!(broadcasted instanceof Promise) ? (
@@ -148,7 +149,10 @@ function ShareSearch({ search, broadcast, back, next }) {
 			</button>
 			<br />
 			<br />
-			<button disabled={searchPromise instanceof Promise} onClick={next}>
+			<button
+				disabled={searchPromise instanceof Promise}
+				onClick={next}
+				className="button">
 				Start
 			</button>
 		</div>

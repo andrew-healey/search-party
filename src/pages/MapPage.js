@@ -3,27 +3,20 @@ import { connect } from "react-redux";
 import L from "leaflet";
 import { sendLocation } from "../actions/searches.js";
 
-let pos;
-
 class Map extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			map: null,
 			mapLoaded: false
-			// location: null
 		};
 		this.watchId = null;
         this.timeoutId = null;
         this.polylines = {};
-        console.log(this.props.currentSearch);
         window.logThis = () => console.log(this);
 	}
 
 	success = ({ coords }) => {
-        let {longitude, latitude} = coords;
-        pos = {longitude, latitude};
-		this.map.setView([coords.latitude, coords.longitude], 20);
 		this.props.sendLocation(coords, this.props.currentSearch.currentUser);
 	};
 	error = error => {};
@@ -40,13 +33,10 @@ class Map extends Component {
 			options
 		);
 
-		let mymap = L.map("mapid", {
+		this.map = L.map("mapid", {
 			zoomControl: false
 		});
-		var latlngs = [[45.51, -122.68], [37.77, -122.43], [34.04, -118.2]];
-		var polyline = L.polyline(latlngs, { color: "red" });
-		// // zoom the map to the polyline
-		//
+		this.map.setView(this.props.currentSearch.center, 20);
 		[
 			L.tileLayer(
 				"https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
@@ -62,15 +52,7 @@ class Map extends Component {
 			L.control.zoom({
 				position: "bottomright"
 			}),
-			polyline
-		].forEach(x => x.addTo(mymap));
-		mymap.fitBounds(polyline.getBounds());
-        this.map = mymap;
-        setInterval(() => {
-            this.props.sendLocation(pos, this.props.currentSearch.currentUser);
-            pos.longitude += 0.00001;
-            pos.latitude  += 0.00001;
-        }, 500)
+		].forEach(x => x.addTo(this.map));
 	}
 
 	componentDidUpdate(){
@@ -95,7 +77,6 @@ class Map extends Component {
 }
 
 export let MapPage = connect(
-	// (s) => s,
 	({searches: {currentSearch}}) => ({currentSearch}),
 	{ sendLocation }
 )(Map);

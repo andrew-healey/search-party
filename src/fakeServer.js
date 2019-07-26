@@ -36,20 +36,50 @@ let search = {
 	currentUser: 1,
 	director: 0,
 	mainChat: 0,
+	center: [38.986397499999995, -77.1117175],
+	teams: [
+		[1, 2, 3, 4],
+	],
 	people: {
 		0: {
 			id: 0,
 			name: "John Smith",
 			email: "john@smith.com",
 			tel: "1234567890",
-			color: "#a7c"
+			color: "#a7c",
+			team: null,
 		},
 		1: {
 			id: 1,
 			name: "Mary Smith",
 			email: "mary@smith.com",
 			tel: "0987654321",
-			color: "#3bf"
+			color: "#3bf",
+			team: 0,
+		},
+		2: {
+			id: 2,
+			name: "James Smith",
+			email: "james@smith.com",
+			tel: "1230456789",
+			color: "#d98",
+			team: 0,
+		},
+		3: {
+			id: 3,
+			name: "James Smith",
+			email: "james@smith.com",
+			tel: "1230456789",
+			color: "#d98",
+			team: 0,
+		},
+		4: {
+			id: 4,
+			name: "James Smith",
+			email: "james@smith.com",
+			tel: "1230456789",
+			color: "#d98",
+			team: 0,
 		}
 	},
 	chats: {
@@ -109,27 +139,9 @@ let m = url => {
 
 let s = m("");
 
-let sendAsdf = false;
-let asdfPosition = {};
-
 s.on("location", ({ location, user }) => {
 	s.emit("user_updated", { user, location });
-	if (!sendAsdf)
-		asdfPosition = {
-			longitude: location.longitude,
-			latitude: location.latitude
-		};
-	sendAsdf = true;
-	console.log(location, asdfPosition);
 });
-
-setInterval(() => {
-	if (sendAsdf) {
-		s.emit("user_updated", { user: 0, location: asdfPosition });
-		asdfPosition.latitude += Math.random() * 0.00001;
-		asdfPosition.longitude += Math.random() * 0.00001;
-	}
-}, 100);
 
 export const socketMiddleware = url => {
 	return storeAPI => {

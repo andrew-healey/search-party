@@ -27,3 +27,10 @@ export const sendLocation = (location, user) => dispatch => {
 		}
 	});
 }
+
+export const setPerson = data => dispatch => {
+	dispatch({
+		type: "SET_PERSON",
+		data
+	});
+}

@@ -41,8 +41,7 @@ i.fa {
 }
 
 html,
-body,
-#root {
+body {
 	width: 100vw;
 	height: 100vh;
 	margin: 0em;
@@ -50,6 +49,7 @@ body,
 }
 
 #root {
+	height: 100vh;
 	text-align: center;
 	position: relative;
 	overflow: hidden;
@@ -144,7 +144,7 @@ body,
 	justify-content: flex-start;
 	align-items: center;
 
-	flex-basis: 4rem;
+	flex-basis: 3.5rem;
 
 	font-size: 1.5em;
 
@@ -154,8 +154,8 @@ body,
 	.modal-icon,
 	.sidebar-icon {
 		font-weight: 100;
-		font-size: 2em;
-		width: 4rem;
+		font-size: 1.75em;
+		width: 3.5rem;
 	}
 }
 .spinning {
@@ -166,39 +166,28 @@ body,
 }
 
 .page-name {
-	/*
-	height: 4em;
-	background: rgba(0, 0, 0, 0.5);
-	background: linear-gradient(
-		180deg,
-		rgba(255, 255, 255, 1) 0%,
-		rgba(255, 255, 255, 0.5) 75%,
-		rgba(255, 255, 255, 0) 100%
-	);
-  /*/
 	background-color: #fff;
-	display: flex;
-	justify-content: flex-start;
-	align-items: center;
-
-	height: 4rem;
-
-	font-size: 1.5em;
-
-	box-sizing: border-box;
 	box-shadow: 0px 0px 9px -2px rgba(0, 0, 0, 0.75);
 
-	.modal-icon {
-		font-size: 1.5em;
-		width: 4rem;
-	}
-	// */
+	display: flex;
+	align-items: center;
+	justify-content: left;
+
+	height: 3.5rem;
+	font-size: 1.25em;
+
+	box-sizing: border-box;
 
 	position: fixed;
 	top: 0px;
 	left: 0px;
 	right: 0px;
 	z-index: 999;
+
+	.modal-icon {
+		font-size: 1.25em;
+		width: 3.5rem;
+	}
 }
 .row {
 	display: flex;
@@ -242,12 +231,12 @@ body,
 		scroll-snap-type: y mandatory;
 
 		.map-spacer {
-			height: 90vh;
+			height: calc(100vh - 3.5em);
 			scroll-snap-align: start;
 		}
 		.content-tabs {
 			background: #fff;
-			height: calc(100vh - 4rem - 7px);
+			height: calc(100vh - 3.5rem - 7px);
 			scroll-snap-align: start;
 			display: flex;
 			flex-direction: column;
@@ -258,6 +247,7 @@ body,
 			.tab-content {
 				flex-grow: 1;
 				padding: 1em;
+				overflow: auto;
 			}
 
 			.tabs {
@@ -374,11 +364,150 @@ $box-border-width: 4px;
 	transform: translateY(-6em);
 }
 
-.button{
+.button {
 	border: none;
-	background-color: #0074D9;
+	background-color: #0074d9;
 	transition: transform 0.25s ease-in-out;
 	padding: 0.75em 3em;
 	color: #fff;
 	margin: 0.5em;
+}
+.search-header {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 3.5em;
+	max-height: 3.5em;
+	box-shadow: 0px 0px 9px -3px rgba(0, 0, 0, 0.75);
+}
+
+.team-page {
+	.team-list {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: center;
+
+		.person-display {
+			display: grid;
+			grid-template-areas: "name arrow" "distance arrow";
+			grid-template-columns: auto auto;
+			grid-template-rows: 1.5em 1.5em;
+			width: 75%;
+			box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.5);
+			margin: 0.5em;
+			text-align: left;
+			padding: 0.25em;
+
+			.person-name,
+			.person-location,
+			.go-to {
+				display: flex;
+				// padding: 0em 1em
+			}
+
+			.person-location {
+				align-items: flex-start;
+				padding-left: 0.5em;
+				color: #888;
+
+				&:empty:before {
+					content: "Unknown";
+				}
+			}
+			.person-name {
+				align-items: flex-end;
+				padding-left: 0.5em;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+			}
+
+			.person-name {
+				grid-area: name;
+			}
+			.person-location {
+				grid-area: distance;
+			}
+			.go-to {
+				grid-area: arrow;
+				align-items: center;
+				justify-content: flex-end;
+				i {
+					padding: 1em;
+				}
+			}
+		}
+	}
+}
+
+.person-modal {
+	.modal-head {
+		height: 40%;
+		position: relative;
+		box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.5);
+		#person-map {
+			height: 100%;
+			pointer-events: none;
+			z-index: 1;
+		}
+		.person-top-bar {
+			position: absolute;
+			z-index: 2;
+			top: 0px;
+			left: 0px;
+			font-size: 1.5em;
+			padding: 0.75rem;
+			color: white;
+			text-shadow: 0px 0px 3px black;
+		}
+	}
+	.modal-content {
+		.name-bar {
+			display: flex;
+			justify-content: space-between;
+			width: 90%;
+			margin: auto;
+			margin-bottom: 2em;
+			.contact-name {
+				font-weight: bold;
+			}
+			.contact-team {
+				color: #555;
+			}
+		}
+		dl {
+			width: 80%;
+			margin: 3em auto;
+
+			dt,
+			dd {
+				margin: 0.5em 0em;
+			}
+
+			dt {
+				color: #777;
+			}
+			dd {
+				// margin: 0px;
+				margin-bottom: 3em;
+			}
+		}
+	}
+	.modal-bottom-bar {
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+
+		font-size: 1.5em;
+
+		box-sizing: border-box;
+		box-shadow: 0px 0px 9px -3px rgba(0, 0, 0, 0.75);
+
+		.modal-icon,
+		.sidebar-icon {
+			font-weight: 100;
+			font-size: 2em;
+			width: 4rem;
+		}
+	}
 }

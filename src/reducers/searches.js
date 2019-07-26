@@ -2,6 +2,7 @@ import reducerFromObject from "./reducerFromObject.js";
 let initialSearchState = {};
 let initialState = {
 	proximal: [],
+	currentPerson: null,
 	currentSearch: null
 };
 let a = reducerFromObject(
@@ -21,23 +22,29 @@ let a = reducerFromObject(
 				...action.data
 			}
 		}),
+		SET_PERSON: (action, state) => ({
+			...state,
+			currentPerson: action.data,
+		}),
 		UPDATE_USER_POSITION: (action, state) => {
-			return ({
+			let { currentSearch } = state;
+			let {
+				user,
+				location: { longitude, latitude }
+			} = action.payload;
+			return {
 				...state,
 				currentSearch: {
-					...state.currentSearch,
+					...currentSearch,
 					trails: {
-						...state.currentSearch.trails,
+						...currentSearch.trails,
 						[action.payload.user]: [
-							...(state.currentSearch.trails[action.payload.user]||[]),
-							[
-								action.payload.location.latitude,
-								action.payload.location.longitude
-							]
+							...(currentSearch.trails[user] || []),
+							[latitude, longitude]
 						]
 					}
 				}
-			})
+			};
 		}
 	},
 	initialState

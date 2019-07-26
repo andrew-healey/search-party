@@ -7,6 +7,7 @@ let initalState = {
         create: false,
         scan_qr: false,
         share_code: false,
+        person_info: false,
     }
 };
 let a = reducerFromObject({

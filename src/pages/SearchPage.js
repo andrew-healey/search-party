@@ -1,25 +1,102 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
 import { setSidebar } from "../actions/ui";
-import PeoplePage from "./PeoplePage";
+import PinnedPage from "./PinnedPage";
 import SettingsPage from "./SettingsPage";
 import TeamPage from "./TeamPage";
 import TimelinePage from "./TimelinePage";
 import { MapPage } from "./MapPage";
+import { createLabel, useScroll } from "../util";
 
 let pointerTimeout;
 
-const SearchPage = ({ setSidebar }) => {
-	let tabNames = ["team", "people", "timeline", "settings"];
+// team/people, chat, pins, guide, settings
+// Chat:
+/*
+
+Menu
+Directions
+Joining
+
+People:
+	- Coordinator
+	- Teams:
+		- People
+
+	- Person modal
+		- location
+		- name
+		- team
+		- phone
+		- email
+		- current/recient media
+			videos
+			pictures
+
+	- Media modal
+		- Media/player
+		- Location
+		- Time
+		- User
+
+Chat:
+	- Messages
+	- Video Broadcast
+	- Voice calls
+
+Pinned:
+	- See all pinned places
+	- Cycle through
+	- See media
+
+Settings:
+	- Names
+	- Contact
+	- Location/bounds
+	- Poster
+	- Privacy
+
+Coordinator:
+	- Map
+		- People
+		- Teams
+		- Pinned
+	Settings
+
+
+
+*/
+
+const SearchPage = ({ setSidebar, currentSearch }) => {
+	let tabNames = ["team", "pinned", "timeline", "settings"];
 	let tabs = [
 		() => <TeamPage />,
-		() => <PeoplePage />,
+		() => <PinnedPage />,
 		() => <TimelinePage />,
 		() => <SettingsPage />
 	];
 	let [tab, setTab] = useState(0);
 	let [pointerEvents, setPointerEvents] = useState(false);
+	let [execScroll, scrollProps, containerProps] = useScroll(
+		t =>
+			t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
+		750
+	);
 	console.log(pointerEvents);
+	let onStart = () => {
+		console.log("onTouchStart", pointerTimeout);
+		clearTimeout(pointerTimeout);
+		pointerTimeout = undefined;
+		setPointerEvents(true);
+	};
+	let onEnd = () => {
+		console.log("onTouchEnd", pointerTimeout);
+		pointerTimeout = setTimeout(() => {
+			// console.trace("cb");
+			setPointerEvents(false)
+		}, 750);
+	};
+
 	return (
 		<div className="page-search">
 			<div className="page-name">
@@ -33,36 +110,30 @@ const SearchPage = ({ setSidebar }) => {
 				<MapPage />
 			</div>
 			<div
+				{...containerProps}
 				className={
 					"map-content" + (pointerEvents ? "" : " no-pointer-events")
-				}>
+				}
+				>
 				<div
 					className="map-spacer"
-					onTouchStart={() => {
-						clearTimeout(pointerTimeout);
-						setPointerEvents(true);
-					}}
-					onTouchEnd={() => {
-						pointerTimeout = setTimeout(
-							() => setPointerEvents(false),
-							750
-						);
-					}}
+					onTouchStart={onStart}
+					onTouchEnd={onEnd}
 				/>
 				<div
+					{...scrollProps}
 					className="content-tabs"
-					onTouchStart={() => {
-						console.log("onTouchStart");
-						clearTimeout(pointerTimeout);
-						setPointerEvents(true);
-					}}
-					onTouchEnd={() => {
-						console.log("onTouchEnd");
-						pointerTimeout = setTimeout(
-							() => setPointerEvents(false),
-							650
-						);
-					}}>
+					onTouchStart={onStart}
+					onTouchEnd={onEnd}>
+					<div
+						className="search-header"
+						onClick={() => {
+							clearTimeout(pointerTimeout);
+							console.log("click");
+							execScroll();
+						}}>
+						Search for {createLabel(currentSearch.names)}
+					</div>
 					<div className="tab-content">{tabs[tab]()}</div>
 					<div className="tabs row space-evenly">
 						{tabNames.map((t, i) => (
@@ -94,6 +165,6 @@ const SearchPage = ({ setSidebar }) => {
 	);
 };
 export default connect(
-	() => ({}),
+	({ searches: { currentSearch } }) => ({ currentSearch }),
 	{ setSidebar }
 )(SearchPage);

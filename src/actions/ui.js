@@ -1,27 +1,21 @@
-export const setSidebar = value => ({
-	type: "SET_SIDEBAR",
-	value
-});
-export const setName = value => ({
-	type: "SET_NAME",
-	value
-});
-export const setCreateModal = value => ({
+let modalAction = modal => value => ({
 	type: "SET_MODAL",
-	modal: "create",
+	modal,
 	value
 });
-export const setQRModal = value => ({
-	type: "SET_MODAL",
-	modal: "scan_qr",
-	value
+
+let setAction = (name, key="value") => value => ({
+	type: "SET_"+name,
+	[key]: value
 });
-export const setCodeModal = value => ({
-	type: "SET_MODAL",
-	modal: "share_code",
-	value
-});
-export const setPage = page => ({
-	type: "SET_PAGE",
-	page
-});
+
+export const setSidebar = setAction("SIDEBAR");
+export const setName = setAction("NAME");
+export const setPage = setAction("PAGE", "page");
+
+
+export const setCreateModal = modalAction("create");
+export const setQRModal = modalAction("scan_qr");
+export const setCodeModal = modalAction("share_code");
+export const setPersonModal = modalAction("person_info");
+
