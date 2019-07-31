@@ -1,4 +1,4 @@
-import React, { Component, useState, forwardRef } from "react";
+import React, { Component, forwardRef } from "react";
 import { connect } from "react-redux";
 import fetch from "../fakeServer";
 

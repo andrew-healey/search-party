@@ -1,4 +1,4 @@
-import React, { useState, Fragment, forwardRef } from "react";
+import React, { forwardRef, Fragment } from "react";
 import { connect } from "react-redux";
 import { PersonDisplay } from "../components/index";
 

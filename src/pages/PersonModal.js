@@ -1,7 +1,7 @@
-import React, { useEffect, Fragment } from "react";
+import L from "leaflet";
+import React, { Fragment, useEffect } from "react";
 import { connect } from "react-redux";
 import { setPersonModal } from "../actions/ui.js";
-import L from "leaflet";
 
 let map;
 let polyline;
@@ -47,7 +47,7 @@ function PersonModal({
                 map.setView(lastPoint, 20);
             }
 		}
-	}, [currentPerson]);
+	}, [currentPerson, currentSearch.trails]);
 
 	let body = person => {
 		return (

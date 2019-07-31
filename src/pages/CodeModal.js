@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { setSearch } from "../actions/searches.js";
 import { setCodeModal, setPage } from "../actions/ui.js";
 import fetch from "../fakeServer.js";
-import { createLabel, createDebouncer } from "../util.js";
+import { createDebouncer, createLabel } from "../util.js";
 
 const debounce = createDebouncer(1000);
 

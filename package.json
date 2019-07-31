@@ -20,7 +20,7 @@
   },
   "scripts": {
     "start": "node backend/index.js",
-    "app": "set HTTPS=true&&react-scripts start",
+    "app": "react-scripts start",
     "build": "react-scripts build",
     "test": "mocha",
     "eject": "react-scripts eject"

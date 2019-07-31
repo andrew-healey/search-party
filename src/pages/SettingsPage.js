@@ -1,5 +1,4 @@
-import React, { Component, useState, forwardRef } from "react";
-import { connect } from "react-redux";
+import React, { forwardRef, useState } from "react";
 import NameList from "../components/NameList.js";
 
 export default forwardRef((props, ref) => {

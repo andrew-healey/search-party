@@ -1,17 +1,12 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
-import {
-	setCodeModal,
-	setCreateModal,
-	setQRModal,
-	setSidebar
-} from "./actions/ui.js";
+import { setSidebar } from "./actions/ui.js";
 import "./App.scss";
 import CodeModal from "./pages/CodeModal";
 import Create from "./pages/Create.js";
 import QRModal from "./pages/InputQR.js";
-import PersonModal from "./pages/PersonModal.js";
 import Landing from "./pages/Landing.js";
+import PersonModal from "./pages/PersonModal.js";
 import SearchPage from "./pages/SearchPage.js";
 import { Sidebar } from "./pages/Sidebar";
 

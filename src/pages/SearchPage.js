@@ -1,13 +1,13 @@
-import React, { useState, useEffect, createRef } from "react";
+import React, { createRef, useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { setSidebar } from "../actions/ui";
+import { createLabel, useScroll } from "../util";
+import GuidePage from "./GuidePage";
+import { MapPage } from "./MapPage";
+import TimelinePage from "./MediaPage";
 import MessagesPage from "./MessagesPage";
 import SettingsPage from "./SettingsPage";
-import GuidePage from "./GuidePage";
 import TeamPage from "./TeamPage";
-import TimelinePage from "./MediaPage";
-import { MapPage } from "./MapPage";
-import { createLabel, useScroll } from "../util";
 
 let pointerTimeout;
 
@@ -57,16 +57,14 @@ const SearchPage = ({ setSidebar, currentSearch }) => {
 
 	const getCurrentTab = () =>
 		refs
-			.map(({ current }, i) => {
-				if (current !== null && tabParentRef.current !== null) {
-					return [
-						Math.abs(
+			.map(({ current }, i) => [
+				current !== null && tabParentRef.current !== null
+					? Math.abs(
 							current.offsetLeft - tabParentRef.current.scrollLeft
-						),
-						i
-					];
-				}
-			})
+					  )
+					: Infinity,
+				i
+			])
 			.sort(([a], [b]) => a - b)[0][1];
 
 	useEffect(() => {
