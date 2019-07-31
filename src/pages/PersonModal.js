@@ -33,12 +33,15 @@ function PersonModal({
 		].forEach(x => x.addTo(map));
 		polyline = L.polyline([]).addTo(map);
 		marker = L.marker([]).addTo(map);
+		
 		// map.setView([1, 1]);
 	}, []);
 
+	let searchTrails = currentSearch && currentSearch.trails;
+
 	useEffect(() => {
-		if (currentPerson !== null) {
-			const trail = currentSearch.trails[currentPerson];
+		if (currentPerson !== null && searchTrails !== null) {
+			const trail = searchTrails[currentPerson];
 			const lastPoint = trail && last(trail);
 			polyline.setLatLngs(trail || []);
 			
@@ -47,7 +50,7 @@ function PersonModal({
                 map.setView(lastPoint, 20);
             }
 		}
-	}, [currentPerson, currentSearch.trails]);
+	}, [currentPerson, searchTrails]);
 
 	let body = person => {
 		return (

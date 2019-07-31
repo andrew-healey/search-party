@@ -13,6 +13,9 @@
 - Search Guides
 - Edit own contact from modal
 
+Offline/service workers
+
+HTTPS
 
 team/people, chat, media, guide, settings
 Chat:
