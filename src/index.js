@@ -7,6 +7,14 @@ import "./index.css";
 import * as serviceWorker from "./serviceWorker.js";
 import store from "./store.js";
 
+// window.addEventListener(
+// 	"beforeunload",
+// 	function() {
+// 		debugger;
+// 	},
+// 	false
+// );
+
 ReactDOM.render(
 	<Router>
 		<Provider store={store}>

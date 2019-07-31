@@ -6,8 +6,58 @@
 - Back, join buttons
 - Action fab
 - Add organizer to proximal list
+- Proximal
 
 - Video and audio communication with rtc
 
 - Search Guides
+- Edit own contact from modal
+
+
+team/people, chat, media, guide, settings
+Chat:
+
+Menu
+Directions
+Joining
+
+People:
+	- Coordinator
+
+	- Person modal
+		- current/recient media
+			videos
+			pictures
+
+	- Media modal
+		- Media/player
+		- Location
+		- Time
+		- User
+
+Chat:
+	- Convert to modal
+	- add sending/recieving capabilities
+	- Fix mount/unmount
+
+Pinned:
+	- See all pinned places
+	- Cycle through
+	- See media
+
+Settings:
+	- Names
+	- Contact
+	- Location/bounds
+	- Poster
+	- Privacy
+
+Coordinator:
+	- Map
+		- People
+		- Teams
+		- Pinned
+	Settings
+
+
 

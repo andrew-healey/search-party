@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { getProximalSearches } from "../actions/searches.js";
-import { setCreateModal, setQRModal, setCodeModal } from "../actions/ui.js";
-import { button, ProximalList } from "../components/index.js";
+import { setCodeModal, setCreateModal, setQRModal } from "../actions/ui.js";
+import { ProximalList } from "../components/index.js";
 
 class Landing extends Component {
 	constructor(props) {

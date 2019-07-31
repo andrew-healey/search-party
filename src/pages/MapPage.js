@@ -1,6 +1,6 @@
+import L from "leaflet";
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import L from "leaflet";
 import { sendLocation } from "../actions/searches.js";
 
 class Map extends Component {
@@ -11,9 +11,9 @@ class Map extends Component {
 			mapLoaded: false
 		};
 		this.watchId = null;
-        this.timeoutId = null;
-        this.polylines = {};
-        window.logThis = () => console.log(this);
+		this.timeoutId = null;
+		this.polylines = {};
+		window.logThis = () => console.log(this);
 	}
 
 	success = ({ coords }) => {
@@ -51,25 +51,23 @@ class Map extends Component {
 			),
 			L.control.zoom({
 				position: "bottomright"
-			}),
+			})
 		].forEach(x => x.addTo(this.map));
 	}
 
-	componentDidUpdate(){
-        let {trails} = this.props.currentSearch;
-        for(let i in trails){
-            if(this.polylines.hasOwnProperty(i)) {
-                this.polylines[i].addLatLng(
-					trails[i][trails[i].length - 1]
-				);
-            } else {
-                this.polylines[i] = L.polyline(trails[i], {
+	componentDidUpdate() {
+		let { trails } = this.props.currentSearch;
+		for (let i in trails) {
+			if (this.polylines.hasOwnProperty(i)) {
+				this.polylines[i].addLatLng(trails[i][trails[i].length - 1]);
+			} else {
+				this.polylines[i] = L.polyline(trails[i], {
 					color: "red"
-                })
-                this.polylines[i].addTo(this.map);
-            }
-        }
-    }
+				});
+				this.polylines[i].addTo(this.map);
+			}
+		}
+	}
 
 	render() {
 		return <div id="mapid" key="map" />;
@@ -77,6 +75,6 @@ class Map extends Component {
 }
 
 export let MapPage = connect(
-	({searches: {currentSearch}}) => ({currentSearch}),
+	({ searches: { currentSearch } }) => ({ currentSearch }),
 	{ sendLocation }
 )(Map);

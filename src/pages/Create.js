@@ -1,22 +1,39 @@
-import React, { Component, useState, Fragment } from "react";
-import { connect } from "react-redux";
-import { setCreateModal, setPage } from "../actions/ui.js";
-import { setSearch } from "../actions/searches.js";
-import fetch from "../fakeServer.js";
 import QRCode from "qrcode.react";
+import React, { Component, Fragment, useState } from "react";
+import { connect } from "react-redux";
+import { setSearch } from "../actions/searches.js";
+import { setCreateModal, setPage } from "../actions/ui.js";
+import fetch from "../fakeServer.js";
+
+import NameList from "../components/NameList.js";
 
 function EnterInfo({ setContact, back, next }) {
-	let [contactInfo, setContactInfo] = useState({
-		Name: "",
-		"Phone Number": "",
-		Email: ""
-	});
-	const inputTypes = {
-		Name: "text",
-		"Phone Number": "tel",
-		Email: "email"
+	const fields = {
+		name: {
+			label: "Name",
+			type: "text"
+		},
+		tel: {
+			label: "Phone Number",
+			type: "tel"
+		},
+		email: {
+			label: "Email",
+			type: "email"
+		}
 	};
-	const inputOrder = ["Name", "Phone Number", "Email"];
+	const inputOrder = ["name", "tel", "email"];
+	const [contactInfo, setContactInfo] = useState({
+		name: "",
+		tel: "",
+		email: ""
+	});
+
+	const createSetter = n => evt =>
+		setContactInfo({
+			...contactInfo,
+			[n]: evt.target.value
+		});
 
 	return (
 		<div>
@@ -25,15 +42,10 @@ function EnterInfo({ setContact, back, next }) {
 				{inputOrder.map((n, i) => (
 					<input
 						key={i}
-						type={inputTypes[n]}
-						placeholder={n}
+						type={fields[n].type}
+						placeholder={fields[n].label}
 						value={contactInfo[n]}
-						onChange={evt =>
-							setContactInfo({
-								...contactInfo,
-								[n]: evt.target.value
-							})
-						}
+						onChange={createSetter(n)}
 					/>
 				))}
 			</div>
@@ -55,40 +67,19 @@ function EnterInfo({ setContact, back, next }) {
 	);
 }
 
-function AddNames({ setNames, back, next }) {
-	let [currentName, setCurrentName] = useState("");
-	let [names, setNameList] = useState([]);
+function AddNames({ names, setNames, back, next }) {
+	// let [names, setNameList] = useState([]);
 	return (
 		<div>
 			<h3 className="title">Names</h3>
-
-			<form
-				onSubmit={e => {
-					setNameList([currentName, ...names]);
-					setNames(names);
-					setCurrentName("");
-					e.preventDefault();
-				}}>
-				<input
-					type="text"
-					className="name-input"
-					placeholder="Add a name"
-					onChange={evt => setCurrentName(evt.target.value)}
-					value={currentName}
-				/>
-			</form>
-			<div className="missing-name-list">
-				{names.map((name, i) => (
-					<div key={i} className="missin-name">
-						{name}
-					</div>
-				))}
-			</div>
+			<NameList names={names} setNames={setNames} />
 			<div className="row space-evenly">
 				<button className="button red" onClick={back}>
 					<i className="fa fa-times" /> Back
 				</button>
-				<button className="button green" onClick={next}>
+				<button
+					className="button green"
+					onClick={next}>
 					Next <i className="fa fa-arrow-right" />
 				</button>
 			</div>
@@ -100,7 +91,6 @@ function ShareSearch({ search, broadcast, back, next }) {
 	let { searchPromise, code, link, broadcasted } = search;
 	return (
 		<div>
-			<h3 className="title">Share</h3>
 			{searchPromise instanceof Promise ? (
 				<Fragment>
 					<h4>Code</h4>
@@ -112,9 +102,13 @@ function ShareSearch({ search, broadcast, back, next }) {
 						<i className="fa fa-sync spinning" /> Link Loading
 					</p>
 					<h4>QR</h4>
-					<p>
-						<i className="fa fa-sync spinning" /> QR Loading
-					</p>
+					{/* <p> */}
+					<div className="qr-spacer">
+						<p>
+							<i className="fa fa-sync spinning" /> QR Loading
+						</p>
+					</div>
+					{/* </p> */}
 				</Fragment>
 			) : (
 				<Fragment>
@@ -123,7 +117,11 @@ function ShareSearch({ search, broadcast, back, next }) {
 					<h4>Link</h4>
 					<p>{link}</p>
 					<h4>QR</h4>
-					<QRCode value={code} />
+					<QRCode
+						value={code}
+						size={200}
+						className="qr-canvas-output"
+					/>
 				</Fragment>
 			)}
 			<br />
@@ -159,6 +157,31 @@ function ShareSearch({ search, broadcast, back, next }) {
 	);
 }
 
+// class Swipable extends Component {
+// 	static Tab = ({ children, onFirstNav=()=>{} }) => {
+// 		this.firstMounts[this.tabNum++] = onFirstNav;
+// 		return children[0];
+// 	};
+
+// 	setTab = tab => {
+// 		let ptab = this.state.tab;
+// 		this.setState({ tab });
+// 		this.onChange(tab, ptab);
+// 		if(this.hasVisited[tab]) this.firstMounts[tab]();
+// 	};
+
+// 	constructor(props) {
+// 		super(props);
+// 		this.state = {
+// 			tab: 0
+// 		};
+// 		this.tabNum = 0;
+// 		this.firstMounts = {};
+// 		this.hasVisited = {};
+// 		this.onChange = props.onChange;
+// 	}
+// }
+
 class Create extends Component {
 	constructor(props) {
 		super(props);
@@ -173,7 +196,9 @@ class Create extends Component {
 				authCode: null,
 				searchPromise: null
 			},
-			exitLeft: false
+			exitLeft: false,
+			reverse: false,
+			ptab: 0
 		};
 		this.tabNames = ["Enter Names", "Add Information", "Share Search"];
 	}
@@ -242,6 +267,7 @@ class Create extends Component {
 	back = () => this.setTab(this.state.tab - 1);
 	next = () => this.setTab(this.state.tab + 1);
 	setTab = tab => {
+		this.setState({ reverse: tab < this.state.tab, ptab: this.state.tab });
 		if (tab === -1) return this.props.setCreateModal(false);
 		if (tab === this.tabNames.length) {
 			this.props.setCreateModal(false);
@@ -259,11 +285,18 @@ class Create extends Component {
 
 	render() {
 		let { active, setCreateModal } = this.props;
-		let { tab, search, exitLeft } = this.state;
+		let {
+			tab,
+			ptab,
+			reverse,
+			search,
+			exitLeft,
+			missing_names
+		} = this.state;
 		let { setNames, setContact, next, back, broadcast } = this;
 		let tabs = {
 			"Enter Names": () => (
-				<AddNames next={next} back={back} setNames={setNames} />
+				<AddNames next={next} back={back} names={missing_names} setNames={setNames} />
 			),
 			"Add Information": () => (
 				<EnterInfo back={back} next={next} setContact={setContact} />
@@ -296,11 +329,26 @@ class Create extends Component {
 					{tabs[this.tabNames[tab]]()}
 				</div>
 				<div className="modal-bottom-bar tabs">
-					{this.tabNames.map((t, i) => (
-						<div key={i} className="create-modal-tab">
-							{t}
+					<div className="progress-container">
+						<div className="progressbar">
+							<div className="track" />
+							{this.tabNames.map((t, i) => (
+								<div
+									key={i}
+									className={
+										"create-modal-tab" +
+										` delay-${
+											reverse ? ptab - i : i - ptab - 1
+										}` +
+										(tab > i ? ` active` : "") +
+										(tab === i ? " current" : "")
+									}
+									onClick={() => this.setTab(i)}>
+									{t}
+								</div>
+							))}
 						</div>
-					))}
+					</div>
 				</div>
 			</div>
 		);

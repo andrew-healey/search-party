@@ -1,47 +1,62 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, Fragment, forwardRef } from "react";
 import { connect } from "react-redux";
 import { PersonDisplay } from "../components/index";
 
 let last = a => a[a.length - 1];
 
-function TeamPage({ currentSearch }) {
-	let team =
-		currentSearch.teams[
-			currentSearch.people[currentSearch.currentUser].team
-		];
-	let currentLocation = last(
-		currentSearch.trails[currentSearch.currentUser] || [null]
-	);
+function TeamPage({ currentSearch, myRef }) {
+	const { currentUser, teams, people, trails, director } = currentSearch;
+	const currentTeamId = people[currentUser].team;
+	const currentTeam = teams[currentTeamId];
+	const currentLocation = last(trails[currentUser] || [null]);
 	return (
-		<div className="team-page">
+		<div ref={myRef} className="tab-page team-page">
 			<h3>Director</h3>
 			<div className="team-list">
 				<PersonDisplay
-					person={currentSearch.people[currentSearch.director]}
-					location={last(
-						currentSearch.trails[currentSearch.director] || [null]
-					)}
+					person={people[director]}
+					location={last(trails[director] || [null])}
 					currentLocation={currentLocation}
-					id={currentSearch.director}
+					id={director}
 				/>
 			</div>
 			<h3>My Team</h3>
 			<div className="team-list">
-				{team.map(p => (
+				{currentTeam.map(p => (
 					<PersonDisplay
 						key={"person-" + p}
-						person={currentSearch.people[p]}
-						location={last(currentSearch.trails[p] || [null])}
+						person={people[p]}
+						location={last(trails[p] || [null])}
 						currentLocation={currentLocation}
 						id={p}
 					/>
 				))}
 			</div>
+			{teams.map((team, i) =>
+				i === currentTeamId ? null : (
+					<Fragment key={"team-"+i}>
+						<h3>Team {i + 1}</h3>
+						<div className="team-list">
+							{team.map(p => (
+								<PersonDisplay
+									key={"person-" + p}
+									person={people[p]}
+									location={last(trails[p] || [null])}
+									currentLocation={currentLocation}
+									id={p}
+								/>
+							))}
+						</div>
+					</Fragment>
+				)
+			)}
 		</div>
 	);
 }
 
-export default connect(
+const Connected = connect(
 	({ searches: { currentSearch } }) => ({ currentSearch }),
 	{}
 )(TeamPage);
+
+export default forwardRef((props, ref) => <Connected {...props} myRef={ref} />);

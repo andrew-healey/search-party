@@ -1,100 +1,97 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, createRef } from "react";
 import { connect } from "react-redux";
 import { setSidebar } from "../actions/ui";
-import PinnedPage from "./PinnedPage";
+import MessagesPage from "./MessagesPage";
 import SettingsPage from "./SettingsPage";
+import GuidePage from "./GuidePage";
 import TeamPage from "./TeamPage";
-import TimelinePage from "./TimelinePage";
+import TimelinePage from "./MediaPage";
 import { MapPage } from "./MapPage";
 import { createLabel, useScroll } from "../util";
 
 let pointerTimeout;
 
-// team/people, chat, pins, guide, settings
-// Chat:
-/*
+const tabNames = ["team", "chat", "media", "settings", "guide"];
+const tabIcons = [
+	"fa-users",
+	"fa-comment-alt",
+	"fa-photo-video",
+	"fa-cog",
+	"fa-question"
+];
+const tabComponents = [
+	TeamPage,
+	MessagesPage,
+	TimelinePage,
+	SettingsPage,
+	GuidePage
+];
 
-Menu
-Directions
-Joining
+const refs = tabNames.map(() => createRef());
 
-People:
-	- Coordinator
-	- Teams:
-		- People
+const tabParentRef = createRef();
+const scrollers = refs.map(ref => useScroll(tabParentRef, ref, "h")[0]);
 
-	- Person modal
-		- location
-		- name
-		- team
-		- phone
-		- email
-		- current/recient media
-			videos
-			pictures
-
-	- Media modal
-		- Media/player
-		- Location
-		- Time
-		- User
-
-Chat:
-	- Messages
-	- Video Broadcast
-	- Voice calls
-
-Pinned:
-	- See all pinned places
-	- Cycle through
-	- See media
-
-Settings:
-	- Names
-	- Contact
-	- Location/bounds
-	- Poster
-	- Privacy
-
-Coordinator:
-	- Map
-		- People
-		- Teams
-		- Pinned
-	Settings
-
-
-
-*/
+const mapParentRef = createRef();
+const [execScroll, scrollProps] = useScroll(mapParentRef, "v");
 
 const SearchPage = ({ setSidebar, currentSearch }) => {
-	let tabNames = ["team", "pinned", "timeline", "settings"];
-	let tabs = [
-		() => <TeamPage />,
-		() => <PinnedPage />,
-		() => <TimelinePage />,
-		() => <SettingsPage />
-	];
-	let [tab, setTab] = useState(0);
-	let [pointerEvents, setPointerEvents] = useState(false);
-	let [execScroll, scrollProps, containerProps] = useScroll(
-		t =>
-			t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
-		750
-	);
-	console.log(pointerEvents);
-	let onStart = () => {
-		console.log("onTouchStart", pointerTimeout);
+	const [tab, setTab] = useState(0);
+	const [pointerEvents, setPointerEvents] = useState(false);
+
+	const tabs = tabComponents.map((TabComponent, i) => (
+		<TabComponent key={"tab-" + i} ref={refs[i]} />
+	));
+
+	const tabButtons = tabNames.map((t, i) => (
+		<div
+			key={i}
+			className={"tab" + (i === tab ? " active" : "")}
+			onClick={() => {
+				scrollers[i]();
+			}}>
+			<i className={"fa " + tabIcons[i]} />
+			{t}
+		</div>
+	));
+
+	const getCurrentTab = () =>
+		refs
+			.map(({ current }, i) => {
+				if (current !== null && tabParentRef.current !== null) {
+					return [
+						Math.abs(
+							current.offsetLeft - tabParentRef.current.scrollLeft
+						),
+						i
+					];
+				}
+			})
+			.sort(([a], [b]) => a - b)[0][1];
+
+	useEffect(() => {
+		if (tabParentRef.current && refs[0].current) {
+			tabParentRef.current.addEventListener(
+				"scroll",
+				() => setTab(getCurrentTab()),
+				{ passive: true }
+			);
+		}
+	}, []);
+
+	let onTouchStart = () => {
 		clearTimeout(pointerTimeout);
 		pointerTimeout = undefined;
 		setPointerEvents(true);
 	};
-	let onEnd = () => {
-		console.log("onTouchEnd", pointerTimeout);
+	let onTouchEnd = () => {
 		pointerTimeout = setTimeout(() => {
-			// console.trace("cb");
-			setPointerEvents(false)
+			setPointerEvents(false);
 		}, 750);
+	};
+	let touchProps = {
+		onTouchStart,
+		onTouchEnd
 	};
 
 	return (
@@ -110,52 +107,24 @@ const SearchPage = ({ setSidebar, currentSearch }) => {
 				<MapPage />
 			</div>
 			<div
-				{...containerProps}
+				ref={mapParentRef}
 				className={
 					"map-content" + (pointerEvents ? "" : " no-pointer-events")
-				}
-				>
-				<div
-					className="map-spacer"
-					onTouchStart={onStart}
-					onTouchEnd={onEnd}
-				/>
-				<div
-					{...scrollProps}
-					className="content-tabs"
-					onTouchStart={onStart}
-					onTouchEnd={onEnd}>
-					<div
-						className="search-header"
-						onClick={() => {
-							clearTimeout(pointerTimeout);
-							console.log("click");
-							execScroll();
-						}}>
+				}>
+				<div className="map-spacer" {...touchProps} />
+				<div className="content-tabs" {...touchProps} {...scrollProps}>
+					<div className="search-header" onClick={execScroll}>
 						Search for {createLabel(currentSearch.names)}
 					</div>
-					<div className="tab-content">{tabs[tab]()}</div>
-					<div className="tabs row space-evenly">
-						{tabNames.map((t, i) => (
-							<div
-								key={i}
-								className={"tab" + (i === tab ? " active" : "")}
-								onClick={() => setTab(i)}>
-								{t}
-							</div>
-						))}
+					<div className="tab-content" ref={tabParentRef}>
+						<div className="all-tabs">{tabs}</div>
 					</div>
+					<div className="tabs row space-evenly">{tabButtons}</div>
 				</div>
 			</div>
 			<div className="map-actions">
 				<button className="">
-					<i className="fa fa-comment-alt" />
-				</button>
-				<button className="">
-					<i className="fa fa-question" />
-				</button>
-				<button className="">
-					<i className="fa fa-bullhorn" />
+					<i className="fa fa-plus" />
 				</button>
 				<button className="">
 					<i className="fa fa-bookmark" />

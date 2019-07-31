@@ -1,53 +1,32 @@
-import React, { Component, useState, useEffect, Fragment, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { connect } from "react-redux";
-import { setCodeModal, setPage } from "../actions/ui.js";
 import { setSearch } from "../actions/searches.js";
+import { setCodeModal, setPage } from "../actions/ui.js";
 import fetch from "../fakeServer.js";
-import { createLabel } from "../util.js";
-import { timeout } from "q";
+import { createLabel, createDebouncer } from "../util.js";
 
-let debounce = (fn, delay) => {
-	let timeOut = null;
-	return (...args) => {
-		if (timeOut) clearTimeout(timeOut);
-		timeOut = setTimeout(() => {
-			console.log(5);
-			fn(...args);
-		}, delay);
-	};
-};
-
-const fetchSearch = debounce((code, setState, setLocalSearch) => {
-	setState("loading");
-	fetch("/api/searches/:search") // TODO: Replace with real
-		.then(data => {
-			setLocalSearch(data);
-			setState("loaded");
-			console.log(data);
-		})
-		.catch(err => setState("error"));
-}, 1500);
+const debounce = createDebouncer(1000);
 
 function CodeModal({ share_code, setCodeModal, setSearch, setPage }) {
-	let [code, setCode] = useState("");
-	let [search, setLocalSearch] = useState(null);
-	let [state, setState] = useState("code");
-
-	const isFirstRun = useRef(true); // a little hacky (used to avoid having fetch run on first);
+	const [code, setCode] = useState("");
+	const [state, setState] = useState("code");
+	const [search, setLocalSearch] = useState();
 
 	useEffect(() => {
-		if (isFirstRun.current) {
-			// See previous comment
-			isFirstRun.current = false;
-			return;
-		}
-		console.log("asdf");
-		fetchSearch(code, setState, setLocalSearch);
-		//eslint-disable-next-line react-hooks/exhaustive-deps
+		if (code !== "")
+			debounce(code => {
+				setState("loading");
+				fetch("/api/searches/:search") // TODO: Replace with real
+					.then(data => {
+						setLocalSearch(data);
+						setState("loaded");
+					})
+					.catch(err => setState("error"));
+			});
 	}, [code]);
 
-	let states = {
-		code: () => null,
+	const states = {
+		code: () => <p>Type in the search code</p>,
 		error: () => <p>No search matches that code</p>,
 		loading: () => (
 			<p>

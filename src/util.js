@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { createRef } from "react";
 
 export let createLabel = names => {
 	let str = names[0];
@@ -25,17 +25,36 @@ export const createAnimation = (update, timing, duration) => (
 	animate();
 };
 
-export const useScroll = (timing, duration) => {
-	const ref = useRef(null);
-	const container = useRef(null);
+export const useScroll = (container, ref="v", direction) => {
+	if (direction === undefined) {
+		direction = ref;
+		ref = createRef();
+	}
+	let htmlAttributes = { ref };
+
 	const executeScroll = () => {
 		container.current.scrollTo({
-			top: ref.current.offsetTop - container.current.scrollTop,
-			left: 0,
+			top:
+				direction === "v"
+					? ref.current.offsetTop
+					: 0,
+			left:
+				direction === "h"
+					? ref.current.offsetLeft
+					: 0,
 			behavior: "smooth"
 		});
 	};
-	const htmlElementAttributes = { ref };
-	const containerAttributes = { ref: container };
-	return [executeScroll, htmlElementAttributes, containerAttributes];
+
+	return [executeScroll, htmlAttributes];
+};
+
+export const createDebouncer = delay => {
+	let timeOut = null;
+	return fn => (...args) => {
+		if (timeOut) clearTimeout(timeOut);
+		timeOut = setTimeout(() => {
+			fn(...args);
+		}, delay);
+	};
 };

@@ -1,10 +1,10 @@
-import React, { Component, useState, Fragment } from "react";
-import { connect } from "react-redux";
-import { setQRModal, setPage } from "../actions/ui.js";
-import { setSearch } from "../actions/searches.js";
-import fetch from "../fakeServer.js";
-import QrReader from "react-qr-scanner";
 import jsQR from "jsqr";
+import React, { Component, Fragment } from "react";
+import QrReader from "react-qr-scanner";
+import { connect } from "react-redux";
+import { setSearch } from "../actions/searches.js";
+import { setPage, setQRModal } from "../actions/ui.js";
+import fetch from "../fakeServer.js";
 import { createLabel } from "../util.js";
 
 const getQRCode = dataUrl =>
