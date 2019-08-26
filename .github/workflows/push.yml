@@ -1,0 +1,23 @@
+on: push
+name: Build and deploy to gh-pages
+jobs:
+  deploy:
+    name: Build and deploy to gh-pages 
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    - name: Install
+      uses: actions/npm@e7aaefe
+      with:
+        args: install
+    - name: Build
+      uses: actions/npm@e7aaefe
+      with:
+        args: run build
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@master
+      env:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: build

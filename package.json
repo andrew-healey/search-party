@@ -1,0 +1,65 @@
+{
+    "name": "react-app",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "apollo-server-express": "^2.9.0",
+        "body-parser": "^1.19.0",
+        "express": "^4.17.1",
+        "express-graphql": "^0.9.0",
+        "graphql": "^14.5.0",
+        "mongoose": "^5.6.10",
+        "react": "^16.9.0",
+        "react-dom": "^16.9.0",
+        "react-scripts": "3.1.1",
+        "supertest": "^4.0.2"
+    },
+    "scripts": {
+        "start": "node backend/index.js",
+        "dev": "npm start && npm run app",
+        "app": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "NODE_ENV=development mocha --require ./setupDOM.js --require ignore-styles --recursive",
+        "eject": "react-scripts eject"
+    },
+    "eslintConfig": {
+        "extends": "react-app"
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    },
+    "devDependencies": {
+        "@babel/core": "^7.5.5",
+        "@babel/plugin-transform-runtime": "^7.5.5",
+        "@babel/register": "^7.5.5",
+        "chai": "^4.2.0",
+        "chai-enzyme": "^1.0.0-beta.1",
+        "enzyme": "^3.10.0",
+        "enzyme-adapter-react-16": "^1.14.0",
+        "gh-pages": "^2.1.1",
+        "ignore-styles": "^5.0.1",
+        "jsdom": "^15.1.1",
+        "mocha": "^6.2.0",
+        "sinon": "^7.4.1"
+    },
+    "homepage": "https://sesamestrong.github.io/react-app",
+    "babel": {
+        "presets": [
+            "@babel/env",
+            "@babel/react"
+        ],
+        "plugins": [
+            "@babel/plugin-transform-runtime",
+            "@babel/plugin-transform-regenerator"
+        ]
+    }
+}
