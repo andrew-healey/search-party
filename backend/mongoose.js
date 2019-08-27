@@ -2,7 +2,11 @@ const SALT_ROUNDS = 12;
 module.exports = new Promise(async (resolve, reject) => {
   const bcrypt=require("bcrypt");
   const mongoose = require("mongoose");
+  const saltshaker=require("randomstring").generate;
+  const jwt=require("jsonwebtoken");
+
   require("dotenv").config();
+  const privateKey = saltshaker();
 
   mongoose.connect(process.env.DATABASE.replace(/<password>/, process.env.PASSWORD), {
     useNewUrlParser: true
@@ -41,6 +45,16 @@ module.exports = new Promise(async (resolve, reject) => {
     if(await bcrypt.compare(password,userAccount.password))
       return true;
     throw "Invalid password";
+  };
+
+  users.statics.genToken=function({username}){
+    return new Promise((resolve, reject) => {
+      jwt.sign({
+        username
+      },privateKey,{expiresIn:'2h'},function(err,token){
+        return err?reject(err):resolve(token);
+      });
+    });
   };
 
   db.on("error", err => reject(err));

@@ -17,6 +17,7 @@ module.exports = new Promise(async (resolve, reject) => {
 type Query {
   me: User
   user(username: String!): User
+  validate(username: String!, password: String!): String
 }
 
 type Mutation{
@@ -37,9 +38,10 @@ schema {
     Query: {
       me:()=>null,
       user:async (_,{username})=>await User.findOne({username}),
+      validate:async (_,{username,password})=>(await User.validate({username,password}))&&(await User.genToken(username)),
     },
     Mutation: {
-      newUser: async (_,{username,password})=>await User.create({username,password}),
+      newUser: async (_,{username,password})=>(await User.create({username,password}))&&(await User.genToken({username})),
     },
     //Add more resolvers here
   };
