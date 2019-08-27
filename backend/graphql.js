@@ -4,6 +4,7 @@ module.exports = new Promise(async (resolve, reject) => {
     ApolloServer,
     gql
   } = require("apollo-server-express");
+  const jwt = require("jsonwebtoken");
 
   const ObjectId = mongoose.Types.ObjectId;
   ObjectId.prototype.valueOf = function() {
@@ -11,7 +12,12 @@ module.exports = new Promise(async (resolve, reject) => {
   };
 
   //Import models
-  const {User} = await require("./mongoose.js");
+  const {
+    models: {
+      User
+    },
+    privateKey
+  } = await require("./mongoose.js");
 
   const typeDefs = gql `
 type Query {
@@ -36,19 +42,50 @@ schema {
 
   const resolvers = {
     Query: {
-      me:()=>null,
-      user:async (_,{username})=>await User.findOne({username}),
-      validate:async (_,{username,password})=>(await User.validate({username,password}))&&(await User.genToken(username)),
+      me: () => null,
+      user: async (_, {
+        username
+      }) => await User.findOne({
+        username
+      }),
+      validate: async (_, {
+        username,
+        password
+      }) => (await User.validate({
+        username,
+        password
+      })) && (await User.genToken(username)),
     },
     Mutation: {
-      newUser: async (_,{username,password})=>(await User.create({username,password}))&&(await User.genToken({username})),
+      newUser: async (_, {
+        username,
+        password
+      }) => (await User.create({
+        username,
+        password
+      })) && (await User.genToken({
+        username
+      })),
     },
     //Add more resolvers here
+  };
+
+  const contextBuilder = function({
+    req
+  }) {
+    return new Promise((resolve, reject) => {
+      const headers = req.headers;
+      const auth = headers.authentication;
+      jwt.verify(auth, privateKey, (err, info) => {
+        resolve({auth,username:!err&&info.username});
+      });
+    });
   };
 
   const server = new ApolloServer({
     typeDefs,
     resolvers,
+    contextBuilder,
   });
 
   resolve((app) => server.applyMiddleware({

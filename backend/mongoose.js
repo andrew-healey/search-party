@@ -65,8 +65,11 @@ module.exports = new Promise(async (resolve, reject) => {
     User=mongoose.model('User',users);
 
     resolve({
+      models:{
       //Models go here
       User,
+      },
+      privateKey,
     });
 
   });
