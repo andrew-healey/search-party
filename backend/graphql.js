@@ -11,7 +11,7 @@ module.exports = new Promise(async (resolve, reject) => {
   };
 
   //Import models
-  const {} = await require("./mongoose.js");
+  const {User} = await require("./mongoose.js");
 
   const typeDefs = gql `
 type Query {
@@ -25,7 +25,6 @@ type Mutation{
 
 type User {
   username: String!
-  pasword: String!
 }
 
 schema {
@@ -36,26 +35,18 @@ schema {
 
   const resolvers = {
     Query: {
+      me:()=>null,
+      user:async (_,{username})=>await User.findOne({username}),
     },
     Mutation: {
+      newUser: async (_,{username,password})=>await User.create({username,password}),
     },
     //Add more resolvers here
-  };
-
-  const context = ({req})=>{
-    //Set context here
-  };
-
-  const loggedIn=next=>(root,args,context,info)=>{
-    //Check if the user is authenticated
-    
-    return next();
   };
 
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context
   });
 
   resolve((app) => server.applyMiddleware({
