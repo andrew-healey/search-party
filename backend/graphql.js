@@ -27,7 +27,7 @@ type Query {
 }
 
 type Mutation{
-  newUser(username: String!, password: String!): User
+  newUser(username: String!, password: String!): String
 }
 
 type User {
@@ -40,9 +40,19 @@ schema {
 }
 `;
 
+  const authenticated = (bool = true) => next => (root, args, context, info) => {
+    console.log(bool);
+    if ((!!(context.username)) == bool)
+      return next(root, args, context, info);
+    throw bool?"Not authenticated.":"Already authenticated.";
+  };
   const resolvers = {
     Query: {
-      me: () => null,
+      me: authenticated()(async (_, args, {
+        username
+      }) => await User.findOne({
+        username
+      })),
       user: async (_, {
         username
       }) => await User.findOne({
@@ -54,10 +64,10 @@ schema {
       }) => (await User.validate({
         username,
         password
-      })) && (await User.genToken(username)),
+      })) && (await User.genToken({username})),
     },
     Mutation: {
-      newUser: async (_, {
+      newUser: authenticated(false)(async (_, {
         username,
         password
       }) => (await User.create({
@@ -65,19 +75,22 @@ schema {
         password
       })) && (await User.genToken({
         username
-      })),
+      }))),
     },
     //Add more resolvers here
   };
 
-  const contextBuilder = function({
+  const context = function({
     req
   }) {
     return new Promise((resolve, reject) => {
       const headers = req.headers;
       const auth = headers.authentication;
       jwt.verify(auth, privateKey, (err, info) => {
-        resolve({auth,username:!err&&info.username});
+        resolve({
+          auth,
+          username: !err && info.username
+        });
       });
     });
   };
@@ -85,7 +98,7 @@ schema {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    contextBuilder,
+    context,
   });
 
   resolve((app) => server.applyMiddleware({
