@@ -15,11 +15,37 @@ module.exports = new Promise(async (resolve, reject) => {
 
   const typeDefs = gql `
 type Query {
+  me: User
+  user(username: String!): User
+  snip:(id: String!): Snip
+  snips(query: SnipQuery): [Snip!]!
 }
 
 type Mutation{
+  newUser(username: String!, password: String!): User
+  newSnip(id:String!,name:String!,editPassword:String,readPassword:String): Snip
+
 }
 
+type User {
+  username: String!
+  pasword: String!
+  snips:[Snip!]!
+}
+
+type Snip {
+  name: String!
+  id: String!
+  editPassword: String
+  readPassword: String
+  owner:User!
+  editors:[User!]!
+  readers:[User!]!
+}
+input SnipQuery {
+  name: String
+  id: String
+}
 
 schema {
   query: Query
