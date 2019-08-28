@@ -24,14 +24,31 @@ type Query {
   me: User
   user(username: String!): User
   validate(username: String!, password: String!): String
+  snip(id: String!): Snip
+  snips(query: SnipQuery): [Snip!]!
 }
 
 type Mutation{
   newUser(username: String!, password: String!): String
+  newSnip(id: String, name: String!, content: String!, public:Bool!): Snip
 }
 
 type User {
   username: String!
+  snips: [Snip]!
+}
+
+type Snip {
+  id: String!
+  name: String!
+  content: String!
+  owner: User!
+  editors: [User!]!
+  public: Bool!
+  readers: [User!]
+}
+input SnipQuery {
+  name: String
 }
 
 schema {
@@ -41,11 +58,11 @@ schema {
 `;
 
   const authenticated = (bool = true) => next => (root, args, context, info) => {
-    console.log(bool);
     if ((!!(context.username)) == bool)
       return next(root, args, context, info);
     throw bool?"Not authenticated.":"Already authenticated.";
   };
+
   const resolvers = {
     Query: {
       me: authenticated()(async (_, args, {
@@ -78,6 +95,11 @@ schema {
       }))),
     },
     //Add more resolvers here
+    User:{
+      snips:async (root,args, context, info)=>
+      (await Promise.all(root.snipIds.map(async snip=>await snip.userHasRole("read")))).filter(i=>i),
+    },
+    Snip:{},
   };
 
   const context = function({
