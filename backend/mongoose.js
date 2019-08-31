@@ -1,7 +1,10 @@
+module.exports=new Promise((resolve, reject) => {
   const bcrypt = require("bcrypt");
   const mongoose = require("mongoose");
   const saltshaker = require("randomstring").generate;
   const jwt = require("jsonwebtoken");
+
+  const SALT_ROUNDS = 12;
 
   require("dotenv").config();
   const privateKey = saltshaker();
@@ -19,20 +22,19 @@
   } = mongoose.Schema.Types;
   //Schema initializations go here
   const users = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  snipIds: [{
-    type: ObjectId,
-    required: true,
-    ref: 'User',
-  }],
-  });
+    username: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    snipIds: [{
+      type: ObjectId,
+      required: true,
+      ref: 'User',
+    }],
   });
 
   users.statics.create = async function({
@@ -45,7 +47,8 @@
       })) throw "User already exists";
     const user = new User({
       username,
-      password: hashPassword
+      password: hashPassword,
+      snipIds:[]
     });
     await user.save();
     return user;
@@ -55,21 +58,19 @@
     username,
     password
   }) {
-    const userAccount = await User.findOne({
+    const user = await User.findOne({
       username
     });
-    if (!userAccount) throw "User not found";
-    if (await bcrypt.compare(password, userAccount.password))
-      return true;
+    if (!user) throw "User not found";
+    if (await bcrypt.compare(password, user.password))
+      return user;
     throw "Invalid password";
   };
 
-  users.statics.genToken = function({
-    username
-  }) {
+  users.methods.genToken = function() {
     return new Promise((resolve, reject) => {
       jwt.sign({
-        username
+        _id: this._id,
       }, privateKey, {
         expiresIn: '2h'
       }, function(err, token) {
@@ -78,13 +79,7 @@
     });
   };
 
-  const snips = new mongoose.Model({
-    id: {
-      type: String,
-      required: true,
-      unique: true,
-      dropDups: true,
-    },
+  const snips = new mongoose.Schema({
     name: {
       type: String,
       required: true,
@@ -93,18 +88,18 @@
       type: String,
       required: true,
     },
-    ownerName: {
-      type: String,
+    ownerId: {
+      type: ObjectId,
       required: true,
       ref: 'User',
     },
-    editorNames: [{
-      type: String,
+    editorIds: [{
+      type: ObjectId,
       required: true,
       ref: 'User',
     }],
-    readerNames: [{
-      type: String,
+    readerIds: [{
+      type: ObjectId,
       required: true,
       ref: 'User',
     }],
@@ -113,6 +108,14 @@
       required: true,
     },
   });
+
+  snips.statics.create=async function({name,public,_id}){
+    const user = await User.findById(_id);
+    const snipNames= await Promise.all(user.snipIds.map(async snipId=>(await Snip.findById(snipId)).name));
+    if(snipNames.includes(name)) throw "The user already has a snip with the name requested.";
+    const snip=new Snip({name,public,content:"//Start Snip here",ownerId:_id,editorIds:[],readerIds:[]});
+    return await new Promise((resolve, reject) => snip.save((err,snip)=>err?reject(err):resolve(snip)));
+  };
 
   const roleToLevel = {
     "read": 1,
@@ -123,20 +126,29 @@
   //Switch all keys and values in roleToLevel
   const levelToRole = Object.keys(roleToLevel).filter((obj, next) => ({ ...obj,
     [roleToLevel[next]]: next
-  });
+  }));
 
-  snips.methods.userHasRole = function({
+  snips.methods.userHasRole = async function({
     role,
-    username
+    _id
   }) {
+    console.log("Started looking for role");
+    if(this.public&&role==="read") return true;
+    console.log("Got past public");
+    if(!_id) return false;
+    if(_id===this.ownerId+"") return true;
+    console.log("Did not match ownwerId");
     const authorizationLevel = roleToLevel[role];
     if (!authorizationLevel) throw "Unknown role";
     const isAuthorized = false;
     for (let i = authorizationLevel; i < highestLevel && !isAuthorized; i++)
-      isAuthorized = isAuthorized || this[levelToRole[i]].includes(username);
+      isAuthorized = isAuthorized || this[levelToRole[i]].filter((last,next)=>last||next+""===_id,false);
+    console.log("Authorized is",isAuthorized);
+    return isAuthorized;
   }
 
-  db.on("error", err => reject(err)); db.on("open", () => {
+  db.on("error", err => reject(err));
+  db.on("open", () => {
     console.log("Connected");
 
     //Model initializations go here
@@ -153,4 +165,4 @@
     });
 
   });
-  });
+});

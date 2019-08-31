@@ -14,7 +14,8 @@ module.exports = new Promise(async (resolve, reject) => {
   //Import models
   const {
     models: {
-      User
+      User,
+      Snip,
     },
     privateKey
   } = await require("./mongoose.js");
@@ -30,7 +31,7 @@ type Query {
 
 type Mutation{
   newUser(username: String!, password: String!): String
-  newSnip(id: String, name: String!, content: String!, public:Bool!): Snip
+  newSnip(name: String!, public:Boolean!): Snip
 }
 
 type User {
@@ -44,7 +45,7 @@ type Snip {
   content: String!
   owner: User!
   editors: [User!]!
-  public: Bool!
+  public: Boolean!
   readers: [User!]
 }
 input SnipQuery {
@@ -57,49 +58,67 @@ schema {
 }
 `;
 
+  //Removes all undefined values from a graphql input query
+  const graphqlToMongoose=query=>(Object.keys(query).reduce((obj,key)=>query[key]===undefined?obj:{...obj,[key]:query[key]},{}));
+
   const authenticated = (bool = true) => next => (root, args, context, info) => {
-    if ((!!(context.username)) == bool)
+    if ((!!(context._id)) == bool)
       return next(root, args, context, info);
-    throw bool?"Not authenticated.":"Already authenticated.";
+    throw bool ? "Not authenticated." : "Already authenticated.";
+  };
+
+  const role = role => next => async (root,args,context,info) => {
+    console.log("Looking for role",role);
+    if(root.constructor.modelName !== "Snip") throw "Roles exist only for snips!";
+    if(await root.userHasRole({role,_id:context._id}))
+      return await next(root,args,context,info);
+    throw "User does not have role.";
   };
 
   const resolvers = {
     Query: {
       me: authenticated()(async (_, args, {
-        username
-      }) => await User.findOne({
-        username
-      })),
+        _id
+      }) => await User.findById(_id)),
       user: async (_, {
         username
       }) => await User.findOne({
         username
       }),
       validate: async (_, {
-        username,
-        password
-      }) => (await User.validate({
-        username,
-        password
-      })) && (await User.genToken({username})),
+          username,
+          password
+        }) =>
+        await (await User.validate({
+          username,
+          password
+        })).genToken(),
+      snip: async (root,{id})=>await Snip.findById(id),
+      snips: async (root,{query:{name}})=>await Snip.find(graphqlToMongoose({name})),
     },
     Mutation: {
       newUser: authenticated(false)(async (_, {
-        username,
-        password
-      }) => (await User.create({
-        username,
-        password
-      })) && (await User.genToken({
-        username
-      }))),
+          username,
+          password
+        }) =>
+        await (await User.create({
+          username,
+          password
+        })).genToken()),
+      newSnip: authenticated()((_,{name,public},{_id})=>
+        Snip.create({name,public,_id})),
     },
     //Add more resolvers here
-    User:{
-      snips:async (root,args, context, info)=>
-      (await Promise.all(root.snipIds.map(async snip=>await snip.userHasRole("read")))).filter(i=>i),
+    User: {
+      snips: (root) => Promise.all(root.snipIds.map(async snipId=>await Snip.findById(snipId))),
     },
-    Snip:{},
+    Snip: {
+      name:role("read")((root)=>root.name),
+      content:role("read")((root)=>root.content),
+      owner:role("read")(async (root)=>await User.findById(root.ownerId)),
+      editors:role("read")((root)=>Promise.all(root.editorIds.map(async editorId=>await User.findById(editorId)))),
+      readers:role("read")((root)=>Promise.all(root.readerIds.map(async readerId=>await User.findById(readerId)))),
+    },
   };
 
   const context = function({
@@ -111,7 +130,7 @@ schema {
       jwt.verify(auth, privateKey, (err, info) => {
         resolve({
           auth,
-          username: !err && info.username
+          _id: !err && info._id
         });
       });
     });
