@@ -142,7 +142,7 @@ module.exports=new Promise((resolve, reject) => {
     if (!authorizationLevel) throw "Unknown role";
     const isAuthorized = false;
     for (let i = authorizationLevel; i < highestLevel && !isAuthorized; i++)
-      isAuthorized = isAuthorized || this[levelToRole[i]].filter((last,next)=>last||next+""===_id,false);
+      isAuthorized = isAuthorized || this[levelToRole[i]].includes(_id);
     console.log("Authorized is",isAuthorized);
     return isAuthorized;
   }
