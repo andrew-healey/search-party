@@ -63,3 +63,4 @@ typings/
 # Vim swap files
 *.swp
 *.swo
+*.swn
