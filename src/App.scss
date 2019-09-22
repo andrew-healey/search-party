@@ -863,15 +863,14 @@ $box-border-width: 4px;
 	box-sizing: border-box;
 	position: relative;
 	width: 100%;
-	padding-bottom: 6px;
-	// height: calc(100% - 6px);
-	height: calc(100%);
+	height: calc(100% - 6px);
 	z-index: 2;
-	// background: url("https://samherbert.net/svg-loaders/svg-loaders/tail-spin.svg");
-	// background-position: center center;
-	// background-repeat: no-repeat;
 }
 .guide-loader {
+	background: url("https://samherbert.net/svg-loaders/svg-loaders/tail-spin.svg");
+	background-position: center center;
+	background-repeat: no-repeat;
+	// display: none;
 	z-index: 1;
 	position: absolute;
 	top: 50%;

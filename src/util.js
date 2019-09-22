@@ -1,4 +1,5 @@
-import { createRef } from "react";
+import { createRef, useEffect } from "react";
+import L from "leaflet";
 
 export let createLabel = names => {
 	let str = names[0];
@@ -9,23 +10,7 @@ export let createLabel = names => {
 	return str;
 };
 
-export const createAnimation = (update, timing, duration) => (
-	cb = () => {}
-) => {
-	const start = +new Date();
-	let cancel = false;
-	const animate = () => {
-		const current = +new Date(),
-			dt = current - start;
-		cancel = cancel || dt > duration;
-		if (!cancel) requestAnimationFrame(animate);
-		update(timing(dt / duration));
-		// cancel = !update(timing(dt / duration));
-	};
-	animate();
-};
-
-export const useScroll = (container, ref="v", direction) => {
+export const useScroll = (container, ref = "v", direction) => {
 	if (direction === undefined) {
 		direction = ref;
 		ref = createRef();
@@ -34,14 +19,8 @@ export const useScroll = (container, ref="v", direction) => {
 
 	const executeScroll = () => {
 		container.current.scrollTo({
-			top:
-				direction === "v"
-					? ref.current.offsetTop
-					: 0,
-			left:
-				direction === "h"
-					? ref.current.offsetLeft
-					: 0,
+			top: direction === "v" ? ref.current.offsetTop : 0,
+			left: direction === "h" ? ref.current.offsetLeft : 0,
 			behavior: "smooth"
 		});
 	};
@@ -58,3 +37,46 @@ export const createDebouncer = delay => {
 		}, delay);
 	};
 };
+
+export const last = a => a[a.length - 1];
+
+export const createMap = (name, options, addons = []) => {
+	let map = L.map(name, {
+		zoomControl: false,
+		attributionControl: false,
+		dragging: false
+	});
+	[
+		L.tileLayer(
+			"https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
+			{
+				maxZoom: 18,
+				id: "mapbox.streets",
+				accessToken:
+					"pk.eyJ1Ijoiam9kcml0aXJrb2Rlc296Y29tIiwiYSI6ImNqeWcybGt4bTFpZ2EzbHFvZWlzbjF6cXIifQ.y13rgUritqRVVew3pyfC_g"
+			}
+		),
+		...addons
+	].forEach(x => x.addTo(map));
+
+	return map;
+};
+
+export const getImageData = img => {
+	const c = document.createElement("canvas");
+	c.width = img.width;
+	c.height = img.height;
+	const ctx = c.getContext("2d");
+	ctx.drawImage(img, 0, 0);
+	return ctx.getImageData(0, 0, img.width, img.height);
+};
+export const getQRCode = dataUrl =>
+	new Promise((resolve, reject) => {
+		const img = new Image();
+		img.src = dataUrl;
+		img.onload = () => {
+			let imageData = getImageData(img);
+			const res = jsQR(imageData.data, img.width, img.height);
+			return res === null ? reject() : resolve(res);
+		};
+	});

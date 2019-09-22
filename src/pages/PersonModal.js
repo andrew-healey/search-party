@@ -2,6 +2,7 @@ import L from "leaflet";
 import React, { Fragment, useEffect } from "react";
 import { connect } from "react-redux";
 import { setPersonModal } from "../actions/ui.js";
+import { createMap } from "../util";
 
 let map;
 let polyline;
@@ -15,26 +16,16 @@ function PersonModal({
 	setPersonModal
 }) {
 	useEffect(() => {
-		map = L.map("person-map", {
+		polyline = L.polyline([]);
+		marker = L.marker([]);
+		map = createMap("person-map", {
 			zoomControl: false,
 			attributionControl: false,
 			dragging: false
-		});
-		[
-			L.tileLayer(
-				"https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
-				{
-					maxZoom: 18,
-					id: "mapbox.streets",
-					accessToken:
-						"pk.eyJ1Ijoiam9kcml0aXJrb2Rlc296Y29tIiwiYSI6ImNqeWcybGt4bTFpZ2EzbHFvZWlzbjF6cXIifQ.y13rgUritqRVVew3pyfC_g"
-				}
-			)
-		].forEach(x => x.addTo(map));
-		polyline = L.polyline([]).addTo(map);
-		marker = L.marker([]).addTo(map);
-		
-		// map.setView([1, 1]);
+		}, [
+			polyline,
+			marker
+		]);
 	}, []);
 
 	let searchTrails = currentSearch && currentSearch.trails;
@@ -44,11 +35,11 @@ function PersonModal({
 			const trail = searchTrails[currentPerson];
 			const lastPoint = trail && last(trail);
 			polyline.setLatLngs(trail || []);
-			
+
 			if (lastPoint) {
-                marker.setLatLng(lastPoint);
-                map.setView(lastPoint, 20);
-            }
+				marker.setLatLng(lastPoint);
+				map.setView(lastPoint, 15);
+			}
 		}
 	}, [currentPerson, searchTrails]);
 

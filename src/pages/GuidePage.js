@@ -11,9 +11,9 @@ export default forwardRef((props, ref) => {
 				title="guide"
 			/>
 			<div className="guide-loader">
-				<p>
+				{/* <p>
 					<i className="fa fa-sync spinning" /> Loading
-				</p>
+				</p> */}
 			</div>
 		</div>
 	);

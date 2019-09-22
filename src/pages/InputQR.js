@@ -5,33 +5,14 @@ import { connect } from "react-redux";
 import { setSearch } from "../actions/searches.js";
 import { setPage, setQRModal } from "../actions/ui.js";
 import fetch from "../fakeServer.js";
-import { createLabel } from "../util.js";
+import { createLabel, getQRCode } from "../util.js";
 
-const getQRCode = dataUrl =>
-	new Promise((resolve, reject) => {
-		const img = new Image();
-		img.src = dataUrl;
-		img.onload = () => {
-			const c = document.createElement("canvas");
-			c.width = img.width;
-			c.height = img.height;
-			const ctx = c.getContext("2d");
-			ctx.drawImage(img, 0, 0);
-			const imageData = ctx.getImageData(0, 0, img.width, img.height);
-			const res = jsQR(imageData.data, img.width, img.height);
-			if (res === null) {
-				reject();
-			} else {
-				resolve(res);
-			}
-		};
-	});
+const delay = 500;
 
 class QRModal extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			delay: 500,
 			type: "video",
 			uploaded_image: "",
 			searchError: false,
@@ -82,7 +63,7 @@ class QRModal extends Component {
 		if (files && files[0]) {
 			let fileReader = new FileReader();
 			fileReader.onloadend = e => {
-				let uploaded_image = e.target.result;
+				const uploaded_image = e.target.result;
 				this.setState({
 					uploaded_image
 				});
@@ -99,6 +80,15 @@ class QRModal extends Component {
 			fileReader.readAsDataURL(files[0]);
 			this.setState({ type: "uploaded" });
 		}
+	};
+
+	done = search => {
+		this.setState({
+			exitLeft: true
+		});
+		setSearch(search);
+		setPage("search");
+		setQRModal(false);
 	};
 
 	render() {
@@ -119,7 +109,7 @@ class QRModal extends Component {
 			video: () => (
 				<Fragment>
 					<QrReader
-						delay={this.state.delay}
+						delay={delay}
 						style={previewStyle}
 						onError={this.handleError}
 						onScan={this.handleScan}
@@ -141,16 +131,7 @@ class QRModal extends Component {
 					/>
 					{search ? (
 						<p>
-							<button
-								className="button"
-								onClick={() => {
-									setSearch(search);
-									setPage("search");
-									this.setState({
-										exitLeft: true
-									});
-									setQRModal(false);
-								}}>
+							<button className="button" onClick={() => this.done(search)}>
 								Search for {createLabel(search.names)}
 							</button>
 						</p>

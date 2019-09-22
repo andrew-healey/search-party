@@ -1,28 +1,12 @@
 import React, { forwardRef, Fragment } from "react";
 import { connect } from "react-redux";
 import { PersonDisplay } from "../components/index";
+import {last} from "../util";
 
-let last = a => a[a.length - 1];
-
-function TeamPage({ currentSearch, myRef }) {
-	const { currentUser, teams, people, trails, director } = currentSearch;
-	const currentTeamId = people[currentUser].team;
-	const currentTeam = teams[currentTeamId];
-	const currentLocation = last(trails[currentUser] || [null]);
-	return (
-		<div ref={myRef} className="tab-page team-page">
-			<h3>Director</h3>
+const TeamListHOC = ({people, trails, currentLocation}) => ({name, personList}) => <Fragment>
+			<h3>{name}</h3>
 			<div className="team-list">
-				<PersonDisplay
-					person={people[director]}
-					location={last(trails[director] || [null])}
-					currentLocation={currentLocation}
-					id={director}
-				/>
-			</div>
-			<h3>My Team</h3>
-			<div className="team-list">
-				{currentTeam.map(p => (
+				{personList.map(p => (
 					<PersonDisplay
 						key={"person-" + p}
 						person={people[p]}
@@ -32,22 +16,23 @@ function TeamPage({ currentSearch, myRef }) {
 					/>
 				))}
 			</div>
+		</Fragment>;
+
+function TeamPage({ currentSearch, myRef }) {
+	const { currentUser, teams, people, trails, director } = currentSearch;
+	const currentTeamId = people[currentUser].team;
+	const currentTeam = teams[currentTeamId];
+	const currentLocation = last(trails[currentUser] || [null]);
+
+	const TeamList = TeamListHOC({...currentSearch, currentLocation});
+
+	return (
+		<div ref={myRef} className="tab-page team-page">
+			<TeamList name="Director" personList={[director]} />
+			<TeamList name="My Team" personList={currentTeam} />
 			{teams.map((team, i) =>
 				i === currentTeamId ? null : (
-					<Fragment key={"team-"+i}>
-						<h3>Team {i + 1}</h3>
-						<div className="team-list">
-							{team.map(p => (
-								<PersonDisplay
-									key={"person-" + p}
-									person={people[p]}
-									location={last(trails[p] || [null])}
-									currentLocation={currentLocation}
-									id={p}
-								/>
-							))}
-						</div>
-					</Fragment>
+					<TeamList key={"team-" + i} name={`Team ${i + 1}`} personList={team} />
 				)
 			)}
 		</div>

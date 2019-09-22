@@ -15,14 +15,16 @@
 
 Offline/service workers
 
-HTTPS
-
 team/people, chat, media, guide, settings
 Chat:
+
+Routing
 
 Menu
 Directions
 Joining
+
+map actions
 
 People:
 	- Coordinator

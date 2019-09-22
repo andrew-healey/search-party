@@ -74,7 +74,8 @@ class MessagesPage extends Component {
 			chats: {},
 			chatOrder: [],
 			currentChat: null,
-			user: props.authCode,
+			authCode: props.authCode,
+			currentUser: props.currentUser,
 			state: "initial",
 			page: "chat-list"
 		};
@@ -103,19 +104,17 @@ class MessagesPage extends Component {
 		this.setState({
 			page: "chat-list"
 		});
-		setTimeout(
-			() =>
-				this.setState({
-					currentChat: null
-				}),
-			200
-		);
 	};
 
 	render() {
-		let { currentChat, state, chats, page } = this.state;
+		let {
+			currentChat,
+			state,
+			chats,
+			page,
+			currentUser
+		} = this.state;
 		let { openChat, closeChat } = this;
-		let { currentUser } = this.props.currentSearch;
 		return (
 			<div ref={this.props.tabRef} className="tab-page chat-page">
 				<div
@@ -138,11 +137,10 @@ class MessagesPage extends Component {
 	}
 }
 
-const Connected = 
-	connect(
-		({ searches: { currentSearch } }) => ({ currentSearch }),
-		{}
-	)(MessagesPage)
+const Connected = connect(
+	({ searches: { currentSearch } }) => ({ currentSearch }),
+	{}
+)(MessagesPage);
 
 export default forwardRef((props, ref) => (
 	<Connected {...props} tabRef={ref} />

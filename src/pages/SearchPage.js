@@ -47,9 +47,7 @@ const SearchPage = ({ setSidebar, currentSearch }) => {
 		<div
 			key={i}
 			className={"tab" + (i === tab ? " active" : "")}
-			onClick={() => {
-				scrollers[i]();
-			}}>
+			onClick={scrollers[i]}>
 			<i className={"fa " + tabIcons[i]} />
 			{t}
 		</div>
@@ -77,19 +75,17 @@ const SearchPage = ({ setSidebar, currentSearch }) => {
 		}
 	}, []);
 
-	let onTouchStart = () => {
-		clearTimeout(pointerTimeout);
-		pointerTimeout = undefined;
-		setPointerEvents(true);
-	};
-	let onTouchEnd = () => {
-		pointerTimeout = setTimeout(() => {
-			setPointerEvents(false);
-		}, 750);
-	};
-	let touchProps = {
-		onTouchStart,
-		onTouchEnd
+	const touchProps = {
+		onTouchStart: () => {
+			clearTimeout(pointerTimeout);
+			pointerTimeout = undefined;
+			setPointerEvents(true);
+		},
+		onTouchEnd: () => () => {
+			pointerTimeout = setTimeout(() => {
+				setPointerEvents(false);
+			}, 750);
+		}
 	};
 
 	return (

@@ -8,21 +8,20 @@ import fetch from "../fakeServer.js";
 import NameList from "../components/NameList.js";
 
 function EnterInfo({ setContact, back, next }) {
-	const fields = {
-		name: {
+	const fields = [
+		{
 			label: "Name",
 			type: "text"
 		},
-		tel: {
+		{
 			label: "Phone Number",
 			type: "tel"
 		},
-		email: {
+		{
 			label: "Email",
 			type: "email"
 		}
-	};
-	const inputOrder = ["name", "tel", "email"];
+	];
 	const [contactInfo, setContactInfo] = useState({
 		name: "",
 		tel: "",
@@ -39,13 +38,13 @@ function EnterInfo({ setContact, back, next }) {
 		<div>
 			<h3 className="title">Contact</h3>
 			<div className="">
-				{inputOrder.map((n, i) => (
+				{fields.map(({label, type}, i) => (
 					<input
 						key={i}
-						type={fields[n].type}
-						placeholder={fields[n].label}
-						value={contactInfo[n]}
-						onChange={createSetter(n)}
+						type={type}
+						placeholder={label}
+						value={contactInfo[type]}
+						onChange={createSetter(type)}
 					/>
 				))}
 			</div>
@@ -68,7 +67,6 @@ function EnterInfo({ setContact, back, next }) {
 }
 
 function AddNames({ names, setNames, back, next }) {
-	// let [names, setNameList] = useState([]);
 	return (
 		<div>
 			<h3 className="title">Names</h3>

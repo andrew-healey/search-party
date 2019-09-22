@@ -2,6 +2,7 @@ import L from "leaflet";
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { sendLocation } from "../actions/searches.js";
+import { createMap } from "../util";
 
 class Map extends Component {
 	constructor(props) {
@@ -13,7 +14,7 @@ class Map extends Component {
 		this.watchId = null;
 		this.timeoutId = null;
 		this.polylines = {};
-		window.logThis = () => console.log(this);
+		this.map = false;
 	}
 
 	success = ({ coords }) => {
@@ -33,26 +34,10 @@ class Map extends Component {
 			options
 		);
 
-		this.map = L.map("mapid", {
+		this.map = createMap("mapid", {
 			zoomControl: false
 		});
 		this.map.setView(this.props.currentSearch.center, 20);
-		[
-			L.tileLayer(
-				"https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
-				{
-					attribution:
-						'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-					maxZoom: 18,
-					id: "mapbox.streets",
-					accessToken:
-						"pk.eyJ1Ijoiam9kcml0aXJrb2Rlc296Y29tIiwiYSI6ImNqeWcybGt4bTFpZ2EzbHFvZWlzbjF6cXIifQ.y13rgUritqRVVew3pyfC_g"
-				}
-			),
-			L.control.zoom({
-				position: "bottomright"
-			})
-		].forEach(x => x.addTo(this.map));
 	}
 
 	componentDidUpdate() {
