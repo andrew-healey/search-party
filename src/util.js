@@ -1,5 +1,7 @@
 import { createRef, useEffect } from "react";
 import L from "leaflet";
+import jsQR from "jsqr";
+
 
 export let createLabel = names => {
 	let str = names[0];
