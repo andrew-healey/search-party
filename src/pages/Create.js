@@ -38,8 +38,9 @@ function EnterInfo({ setContact, back, next }) {
 		<div>
 			<h3 className="title">Contact</h3>
 			<div className="">
-				{fields.map(({label, type}, i) => (
+				{fields.map(({ label, type }, i) => (
 					<input
+						className="search-info-input"
 						key={i}
 						type={type}
 						placeholder={label}
@@ -75,9 +76,7 @@ function AddNames({ names, setNames, back, next }) {
 				<button className="button red" onClick={back}>
 					<i className="fa fa-times" /> Back
 				</button>
-				<button
-					className="button green"
-					onClick={next}>
+				<button className="button green" onClick={next}>
 					Next <i className="fa fa-arrow-right" />
 				</button>
 			</div>
@@ -294,7 +293,12 @@ class Create extends Component {
 		let { setNames, setContact, next, back, broadcast } = this;
 		let tabs = {
 			"Enter Names": () => (
-				<AddNames next={next} back={back} names={missing_names} setNames={setNames} />
+				<AddNames
+					next={next}
+					back={back}
+					names={missing_names}
+					setNames={setNames}
+				/>
 			),
 			"Add Information": () => (
 				<EnterInfo back={back} next={next} setContact={setContact} />

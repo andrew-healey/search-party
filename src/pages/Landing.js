@@ -18,7 +18,7 @@ class Landing extends Component {
 		let { proximal } = this.props;
 		return (
 			<div className="page landing">
-				<div className="background-map">
+				{/* <div className="background-map"> */}
 					<div className="map-actions">
 						<h2 className="title center">Create Search</h2>
 						<button
@@ -44,7 +44,7 @@ class Landing extends Component {
 						<h3 className="title center">Proximal</h3>
 						<ProximalList proximal={proximal} />
 					</div>
-				</div>
+				{/* </div> */}
 			</div>
 		);
 	}

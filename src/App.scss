@@ -30,13 +30,12 @@
 }
 
 html {
-  scroll-behavior: smooth;
+	scroll-behavior: smooth;
 }
 
 * {
 	// 	outline: 1px solid red;
 	box-sizing: border-box;
-
 }
 
 body {
@@ -49,7 +48,7 @@ i.fa {
 
 .center {
 	width: 100%;
-	height: 100%;
+	// height: 100%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -75,13 +74,13 @@ i.fa {
 html,
 body {
 	width: 100vw;
-	height: 100vh;
+	height: 100%;
 	margin: 0em;
 	padding: 0em;
 }
 
 #root {
-	height: 100vh;
+	height: 100%;
 	text-align: center;
 	position: absolute;
 	overflow-y: auto;
@@ -89,6 +88,67 @@ body {
 	left: 0px;
 	top: 0px;
 	width: 100vw;
+}
+
+.name-input, .search-info-input {
+	display:block;
+	width: 60%;
+	margin: 1em auto;
+	border: none;
+	border-bottom: 2px solid #0074d9;
+	padding: 0.5em;
+	font-size: 1em;
+}
+
+.missing-name {
+	padding: 0.5em;
+    display: flex;
+	justify-content: space-between;
+}
+.missing-name-list {
+	padding: 0.5em;
+}
+
+.landing {
+	background: url("https://atomicsmash-725c.kxcdn.com/wp-content/uploads/2017/09/BristolMap-1-520x350.png");
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+	overflow: auto;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+
+	.map-actions {
+		padding: 1em;
+	}
+	.non-map-actions {
+		position: relative;
+		.title {
+			position: sticky;
+			top: 0em;
+			padding: 0.75em 0em;
+			margin: 0em;
+			background-color: #fff;
+		}
+		flex-grow: 1;
+		width: calc(100vw - 1em);
+		margin: auto;
+		overflow: auto;
+		// height: 100%;
+		background-color: #fff;
+	}
+
+	.proximal-card {
+		display: flex;
+		width: 80%;
+		margin: 0.75em auto;
+		background-color: #0074d9;
+		color: #fff;
+		justify-content: space-between;
+		padding: 1em;
+		box-shadow: -3px 3px 10px rgba(0, 0, 0, 0.25);
+	}
 }
 
 .modal {
@@ -234,10 +294,8 @@ body {
 	justify-content: space-evenly;
 }
 .page-search {
-	// height: 100vh;
 	width: 100%;
 	position: absolute;
-	// overflow: hidden;
 	.map-bg {
 		position: fixed;
 		left: 0px;
@@ -340,12 +398,14 @@ body {
 	}
 
 	.map-actions {
+		// overflow: auto;
 		position: absolute;
 		display: flex;
 		align-items: center;
 		justify-content: space-evenly;
 		z-index: 9;
 		pointer-events: none;
+		overflow: auto;
 
 		/* // Across side
 		left: 0px;
@@ -438,6 +498,7 @@ $box-border-width: 4px;
 }
 
 .button {
+	font-size: 0.75em;
 	border: none;
 	background-color: #0074d9;
 	transition: transform 0.25s ease-in-out;

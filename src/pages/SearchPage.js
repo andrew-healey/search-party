@@ -108,7 +108,7 @@ const SearchPage = ({ setSidebar, currentSearch }) => {
 				<div className="map-spacer" {...touchProps} />
 				<div className="content-tabs" {...touchProps} {...scrollProps}>
 					<div className="search-header" onClick={execScroll}>
-						Search for {createLabel(currentSearch.names)}
+						{createLabel(currentSearch.names)}
 					</div>
 					<div className="tab-content" ref={tabParentRef}>
 						<div className="all-tabs">{tabs}</div>
